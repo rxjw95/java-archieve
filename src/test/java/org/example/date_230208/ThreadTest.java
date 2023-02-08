@@ -70,12 +70,9 @@ public class ThreadTest {
         Assertions.assertEquals(values[0], ValidatingValue.getValueOfFirstThread());
         Assertions.assertEquals(values[1], ValidatingValue.getValueOfSecondThread());
         Assertions.assertEquals(values[2], ValidatingValue.getValueOfThirdThread());
-
-        ThreadLocalUtil.clear();
     }
 
 }
-
 
 class ThreadInfoCollector implements Runnable {
     private final int threadNumber;
@@ -92,6 +89,7 @@ class ThreadInfoCollector implements Runnable {
         System.out.println(ThreadLocalUtil.get());
 
         updateValueByThreadNumber(threadNumber, threadLocalValue);
+        ThreadLocalUtil.clear();
     }
 
     public void updateValueByThreadNumber(int threadNumber, String value) {
