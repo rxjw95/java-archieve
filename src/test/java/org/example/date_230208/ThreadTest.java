@@ -3,7 +3,25 @@ package org.example.date_230208;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.IntStream;
+
+
+class CountDownLatchUtil {
+    private static CountDownLatch countDownLatch = null;
+
+    public static void setCount(int count) {
+        countDownLatch = new CountDownLatch(count);
+    }
+
+    public static void countDown() {
+        countDownLatch.countDown();
+    }
+
+    public static void await() throws InterruptedException {
+        countDownLatch.await();
+    }
+}
 
 class ThreadLocalUtil {
 
@@ -59,13 +77,14 @@ public class ThreadTest {
     public void threadLocalTest() throws InterruptedException {
         final String[] values = {"apple", "banana", "melon"};
 
-        IntStream.rangeClosed(1, 3)
-                .forEach(iter -> {
-                    Thread thread = new Thread(new ThreadInfoCollector(iter, values[iter - 1]));
-                    thread.start();
-                });
+        CountDownLatchUtil.setCount(3);
 
-        Thread.sleep(1000);
+        IntStream.rangeClosed(1, 3)
+                .mapToObj(i -> new ThreadInfoCollector(i, values[i - 1]))
+                .map(Thread::new)
+                .forEach(Thread::start);
+
+        CountDownLatchUtil.await();
 
         Assertions.assertEquals(values[0], ValidatingValue.getValueOfFirstThread());
         Assertions.assertEquals(values[1], ValidatingValue.getValueOfSecondThread());
@@ -90,12 +109,13 @@ class ThreadInfoCollector implements Runnable {
 
         updateValueByThreadNumber(threadNumber, threadLocalValue);
         ThreadLocalUtil.clear();
+        CountDownLatchUtil.countDown();
     }
 
     public void updateValueByThreadNumber(int threadNumber, String value) {
-        if(threadNumber == 1)  ValidatingValue.setValueOfFirstThread(value);
-        if(threadNumber == 2)  ValidatingValue.setValueOfSecondThread(value);
-        if(threadNumber == 3)  ValidatingValue.setValueOfThirdThread(value);
+        if (threadNumber == 1) ValidatingValue.setValueOfFirstThread(value);
+        if (threadNumber == 2) ValidatingValue.setValueOfSecondThread(value);
+        if (threadNumber == 3) ValidatingValue.setValueOfThirdThread(value);
     }
 
 }
