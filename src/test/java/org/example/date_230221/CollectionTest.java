@@ -22,6 +22,7 @@ public class CollectionTest {
         Money money1 = new Money(100);
         Money money2 = new Money(100);
 
+
         Set<Money> moneySet = new HashSet<>();
         moneySet.add(money1);
         moneySet.add(money2);
