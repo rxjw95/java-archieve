@@ -11,7 +11,7 @@ public class CollectionTest {
         Money money1 = new Money(100);
         Money money2 = new Money(100);
 
-        assertThat(money1.equals(money2)).isFalse();
+        assertThat(money1.equals(money2)).isTrue();
     }
 
 }
